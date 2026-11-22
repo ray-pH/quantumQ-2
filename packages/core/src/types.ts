@@ -19,6 +19,7 @@ export type Circuit = readonly (readonly string[])[];
 
 export const ALL_GATES = Object.values(Gate);
 export const COLUMN_COUNT = 12;
+export const MAX_QUBITS = 4;
 
 export type CircuitInput =
   | Readonly<{ kind: "basis"; bits: readonly Bit[] }>

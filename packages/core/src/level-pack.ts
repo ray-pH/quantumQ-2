@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { goalSchema } from "./goal.ts";
 import { probability, qubitCount } from "./simulator.ts";
-import { ALL_GATES, COLUMN_COUNT, Gate } from "./types.ts";
+import { ALL_GATES, COLUMN_COUNT, Gate, MAX_QUBITS } from "./types.ts";
 import type { Complex, Level, Matrix } from "./types.ts";
 
 export type CustomGate = Readonly<{
@@ -26,7 +27,6 @@ export type LevelPack = Readonly<{
   sections: readonly PackSection[];
 }>;
 
-const MAX_QUBITS = 4;
 const MAX_LEVELS = 128;
 const MAX_IMAGE_BYTES = 512 * 1024;
 const TOLERANCE = 0.0001;
@@ -61,12 +61,7 @@ const levelSchema = z.object({
       amplitudes,
     }),
   ]),
-  goal: z
-    .object({
-      kind: z.enum(["probability", "amplitude"]),
-      amplitudes,
-    })
-    .nullable(),
+  goal: goalSchema,
   gates: z.array(identifier).min(1).max(32),
   locked: z
     .array(

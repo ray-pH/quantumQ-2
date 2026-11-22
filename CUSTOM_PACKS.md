@@ -67,7 +67,8 @@ This example puts a puzzle and a sandbox in separate sections. Solving the puzzl
 
 - Give each level a nonnegative integer `id` unique within its pack. Different packs can reuse the same level IDs.
 - For a basis input, set `input.kind` to `"basis"` and list the `bits` from the top wire to the bottom. For a custom quantum state, use `{"kind":"state","qubits":2,"amplitudes":[[1,0],[0,0],[0,0],[0,0]]}`.
-- Each amplitude is a JSON pair `[real, imaginary]`. List amplitudes in binary order, from `|00⟩` through `|11⟩` for two qubits. Input state and goal amplitudes must have unit norm.
+- List amplitudes in binary order, from `|00⟩` through `|11⟩` for two qubits. Input state and goal amplitudes must have unit norm. Input state amplitudes use numeric pairs `[real, imaginary]`.
+- In `goal.amplitudes`, use a real value or a pair `[real, imaginary]`. Each value can be a number or a quoted expression such as `"1 / sqrt(2)"`. Expressions support `sqrt()`, parentheses, `+`, `-`, `*`, `/`, and `^` for powers. Use the second entry of a pair for the imaginary coefficient.
 - A goal of kind `"amplitude"` compares the complex coefficients. A goal of kind `"probability"` compares the squared magnitudes. Use `null` for a sandbox.
 - Use optional `unlockAfter` to require the player to solve specific puzzles in this pack. For example, `"unlockAfter": [1, 3]` requires both puzzles 1 and 3. Prerequisites can refer to puzzles in any section. Each ID must be unique in the list, and the dependencies must be acyclic.
 - Use `gates` to list the available gate IDs, including `empty` for erasing. The built-in IDs are `empty`, `h`, `x`, `y`, `z`, `control`, and `s`.
@@ -75,6 +76,15 @@ This example puts a puzzle and a sandbox in separate sections. Solving the puzzl
 - `task` and optional `help` support `[b]bold[/b]`, `[i]math[/i]`, and `[code]monospace[/code]`. Supply `help` as an array of strings, including any line breaks between parts.
 
 Levels with no prerequisites are available as soon as the pack is imported. **Next Level** goes to the next available puzzle in section order. The profile saves completions by pack identifier and level ID.
+
+The starter pack's superposition puzzle uses both ways to write a real goal amplitude.
+
+```json
+{
+  "kind": "amplitude",
+  "amplitudes": ["1 / sqrt(2)", ["1 / sqrt(2)", 0]]
+}
+```
 
 ## Custom gates and artwork
 

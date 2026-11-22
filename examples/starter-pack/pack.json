@@ -52,6 +52,18 @@
           "input": { "kind": "basis", "bits": [0, 0] },
           "goal": null,
           "gates": ["empty", "h", "control", "flip"]
+        },
+        {
+          "id": 3,
+          "description": "Create a superposition",
+          "unlockAfter": [1],
+          "task": "Use the [b]Hadamard[/b] gate to give [i]|0⟩[/i] and [i]|1⟩[/i] equal amplitudes.",
+          "input": { "kind": "basis", "bits": [0] },
+          "goal": {
+            "kind": "amplitude",
+            "amplitudes": ["1 / sqrt(2)", ["1 / sqrt(2)", 0]]
+          },
+          "gates": ["empty", "h"]
         }
       ]
     }

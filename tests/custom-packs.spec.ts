@@ -131,7 +131,7 @@ test("imports, rearranges, and saves custom level packs with image and text gate
   await expect(
     dialog.getByText(starter.version, { exact: true }),
   ).toBeVisible();
-  await expect(dialog.getByText("Practice (1)")).toBeVisible();
+  await expect(dialog.getByText("Practice (2)")).toBeVisible();
   const customGates = dialog.getByRole("region", { name: "Custom gates" });
   const flipRow = customGates.getByRole("row", { name: /^Bit flip/ });
   await expect(flipRow.getByText("F", { exact: true })).toBeVisible();
@@ -262,6 +262,11 @@ test("imports, rearranges, and saves custom level packs with image and text gate
       .evaluate((img) => (img as HTMLImageElement).naturalWidth),
   ).toBeGreaterThan(0);
   await paletteGate.click();
+  await page.getByRole("button", { name: /^Qubit 1, column 1, Empty/ }).click();
+  await page.getByRole("button", { name: "Evaluate" }).click();
+  await expect(dialog).toHaveAccessibleName("Success");
+  await dialog.getByRole("button", { name: "Next Level" }).click();
+  await page.getByRole("button", { name: "Hadamard (H)", exact: true }).click();
   await page.getByRole("button", { name: /^Qubit 1, column 1, Empty/ }).click();
   await page.getByRole("button", { name: "Evaluate" }).click();
   await expect(dialog).toHaveAccessibleName("Success");
