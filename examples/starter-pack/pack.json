@@ -1,0 +1,59 @@
+{
+  "formatVersion": 1,
+  "author-id": "your-username",
+  "id": "starter",
+  "name": "My first pack",
+  "version": "1.0.0",
+  "gates": [
+    {
+      "id": "flip",
+      "name": "Bit flip",
+      "symbol": "F",
+      "matrix": [
+        [
+          [0, 0],
+          [1, 0]
+        ],
+        [
+          [1, 0],
+          [0, 0]
+        ]
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "name": "Getting started",
+      "levels": [
+        {
+          "id": 1,
+          "description": "Flip a qubit",
+          "task": "Use the [b]F[/b] gate to turn [i]|0⟩[/i] into [i]|1⟩[/i].",
+          "input": { "kind": "basis", "bits": [0] },
+          "goal": {
+            "kind": "amplitude",
+            "amplitudes": [
+              [0, 0],
+              [1, 0]
+            ]
+          },
+          "gates": ["empty", "flip"]
+        }
+      ]
+    },
+    {
+      "name": "Practice",
+      "levels": [
+        {
+          "id": 2,
+          "description": "Try the gates",
+          "unlockAfter": [1],
+          "task": "Build and evaluate any circuit.",
+          "input": { "kind": "basis", "bits": [0, 0] },
+          "goal": null,
+          "gates": ["empty", "h", "control", "flip"]
+        }
+      ]
+    }
+  ]
+}

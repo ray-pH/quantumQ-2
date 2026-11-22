@@ -1,18 +1,28 @@
 <script lang="ts">
   import { LEVELS, SECTIONS } from "@quantumq/core";
-  import type { Level } from "@quantumq/core";
+  import type { Level, LevelPack, SaveData } from "@quantumq/core";
+  import type { SvelteSet } from "svelte/reactivity";
   import { asset } from "../assets";
+  import CustomPacks from "./CustomPacks.svelte";
 
   export type MenuDialog = "gates" | "options" | "about";
 
   let {
-    unlocked,
+    save,
+    expandedPacks,
     openLevel,
+    installPack,
+    movePack,
+    openPackInfo,
     openDialog,
     scrollRegion = $bindable(),
   }: {
-    unlocked: readonly number[];
-    openLevel: (id: number) => void;
+    save: SaveData;
+    expandedPacks: SvelteSet<string>;
+    openLevel: (id: number, packKey?: string) => void;
+    installPack: (pack: LevelPack) => Promise<void>;
+    movePack: (key: string, direction: -1 | 1) => void;
+    openPackInfo: (pack: LevelPack) => void;
     openDialog: (dialog: MenuDialog) => void;
     scrollRegion: HTMLElement | undefined;
   } = $props();
@@ -51,7 +61,7 @@
         {/if}
         <div class="level-grid">
           {#each section.levels as level (level.id)}
-            {@const isUnlocked = unlocked.includes(level.id)}
+            {@const isUnlocked = save.unlocked.includes(level.id)}
             <button
               class="button level-button"
               aria-label={`${level.goal === null ? "Sandbox" : "Level"} ${level.id}${isUnlocked ? "" : ", locked"}`}
@@ -64,6 +74,15 @@
         </div>
       </div>
     {/each}
+    <CustomPacks
+      packs={save.packs}
+      progress={save.packProgress}
+      {expandedPacks}
+      {openLevel}
+      {installPack}
+      {movePack}
+      {openPackInfo}
+    />
   </section>
 </main>
 
@@ -125,22 +144,6 @@
     font-size: 1rem;
     font-weight: 400;
     margin: 0 0 0.45rem;
-  }
-
-  .level-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: clamp(0.35rem, 1.1vw, 0.65rem);
-  }
-
-  .level-button {
-    min-width: 0;
-    min-height: 2.75rem;
-    aspect-ratio: 1;
-    max-width: 4rem;
-    padding: 0;
-    font-size: 1.15rem;
-    font-variant-numeric: tabular-nums;
   }
 
   @media (min-width: 681px) and (max-height: 510px) {

@@ -5,6 +5,53 @@ import { LazyStore } from "@tauri-apps/plugin-store";
 
 const browserKey = "quantumq.save";
 
+function browserStorage(): SaveStorage {
+  const database = new Promise<IDBDatabase | null>((resolve) => {
+    if (typeof indexedDB === "undefined") {
+      resolve(null);
+      return;
+    }
+    const request = indexedDB.open("quantumq", 1);
+    request.onupgradeneeded = () => request.result.createObjectStore("profile");
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => resolve(null);
+  });
+
+  return {
+    async load() {
+      const db = await database;
+      if (db) {
+        const current = await new Promise<unknown>((resolve, reject) => {
+          const request = db
+            .transaction("profile")
+            .objectStore("profile")
+            .get("save");
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        if (current !== undefined) return current;
+      }
+
+      const legacy = localStorage.getItem(browserKey);
+      return legacy === null ? undefined : JSON.parse(legacy);
+    },
+    async save(data) {
+      const db = await database;
+      if (!db) {
+        localStorage.setItem(browserKey, JSON.stringify(data));
+        return;
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction("profile", "readwrite");
+        transaction.oncomplete = () => resolve();
+        transaction.onabort = () => reject(transaction.error);
+        transaction.objectStore("profile").put(data, "save");
+      });
+    },
+  };
+}
+
 export function getStorage(): SaveStorage {
   if (isTauri()) {
     const store = new LazyStore("quantumq.json", { autoSave: false });
@@ -27,13 +74,5 @@ export function getStorage(): SaveStorage {
     return storage;
   }
 
-  return {
-    async load() {
-      const encoded = localStorage.getItem(browserKey);
-      return encoded === null ? undefined : JSON.parse(encoded);
-    },
-    async save(data) {
-      localStorage.setItem(browserKey, JSON.stringify(data));
-    },
-  };
+  return browserStorage();
 }

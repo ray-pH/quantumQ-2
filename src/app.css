@@ -105,6 +105,22 @@ a:focus-visible {
   cursor: default;
 }
 
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(0.35rem, 1.1vw, 0.65rem);
+}
+
+.level-button {
+  min-width: 0;
+  min-height: 2.75rem;
+  aspect-ratio: 1;
+  max-width: 4rem;
+  padding: 0;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .math {
   font-family: "Latin Modern Math", Ubuntu, serif;
 }

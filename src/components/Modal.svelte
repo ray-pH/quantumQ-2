@@ -61,6 +61,7 @@
     margin: 0;
     padding: 0.94rem 1.1rem;
     font-size: 1.25rem;
+    overflow-wrap: anywhere;
   }
 
   .content {

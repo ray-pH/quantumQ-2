@@ -50,13 +50,44 @@ test("uses the saved gate symbol in both Pauli-X and CNOT help", async ({
   }
 });
 
-test("renders both Hadamard mappings as MathML fractions", async ({ page }) => {
+test("renders built-in gate matrices and basis mappings", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Gates", exact: true }).click();
   const hadamard = page.getByRole("row", { name: /Hadamard/ });
-  await expect(hadamard.locator("math mfrac")).toHaveCount(2);
-  await expect(hadamard.locator("mfrac msqrt")).toHaveText(["2", "2"]);
-  await expect(hadamard.locator("mfrac mrow mo")).toHaveText(["+", "−"]);
+  const matrix = hadamard.getByRole("cell").nth(1);
+  const mappings = hadamard.getByRole("cell").nth(2);
+  await expect(matrix.locator("mfrac msqrt")).toHaveText("2");
+  await expect(matrix.locator("mtable mtext")).toHaveText([
+    "1",
+    "1",
+    "1",
+    "−1",
+  ]);
+  await expect(mappings.locator("math mfrac")).toHaveCount(2);
+  await expect(mappings.locator("mfrac msqrt")).toHaveText(["2", "2"]);
+  await expect(mappings.locator("mfrac mrow mo")).toHaveText(["+", "−"]);
+  const pauliY = page.getByRole("row", { name: /Pauli-Y/ });
+  await expect(pauliY.locator("mtable mtext")).toHaveText([
+    "0",
+    "−i",
+    "i",
+    "0",
+  ]);
+  await expect(pauliY.locator("math > mrow")).toHaveText([
+    /i\s*\|1⟩/,
+    /−\s*i\s*\|0⟩/,
+  ]);
+
+  await page.setViewportSize({ width: 360, height: 760 });
+  await expect
+    .poll(() =>
+      page
+        .getByRole("table", { name: "Built-in gates" })
+        .evaluate(
+          (table) => table.scrollWidth <= table.parentElement!.clientWidth,
+        ),
+    )
+    .toBe(true);
 });
 
 test("plays the introduction through the first controlled gate and restores progress", async ({

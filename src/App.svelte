@@ -1,13 +1,15 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
-  import { createGameApp, Gate, TUTORIALS } from "@quantumq/core";
-  import type { GameApp, GameState } from "@quantumq/core";
-  import { asset, gateNames } from "./assets";
+  import { SvelteSet } from "svelte/reactivity";
+  import { createGameApp, levelPackKey, packLevels } from "@quantumq/core";
+  import type { GameApp, GameState, LevelPack } from "@quantumq/core";
+  import { asset } from "./assets";
   import GameBoard from "./components/GameBoard.svelte";
-  import GateIcon from "./components/GateIcon.svelte";
+  import GateReference from "./components/GateReference.svelte";
   import LevelSelect from "./components/LevelSelect.svelte";
   import type { MenuDialog } from "./components/LevelSelect.svelte";
   import Modal from "./components/Modal.svelte";
+  import PackInfo from "./components/PackInfo.svelte";
   import RichText from "./components/RichText.svelte";
   import { getStorage } from "./storage";
 
@@ -20,22 +22,15 @@
     return: "Return to Menu?",
     success: "Success",
   };
-  const gateReference = [
-    { gate: Gate.H },
-    { gate: Gate.X, zero: "|1⟩", one: "|0⟩" },
-    { gate: Gate.Y, zero: "i|1⟩", one: "−i|0⟩" },
-    { gate: Gate.Z, zero: "|0⟩", one: "−|1⟩" },
-    { gate: Gate.S, zero: "|0⟩", one: "i|1⟩" },
-  ] as const;
-
   let app: GameApp | undefined;
   let gameState = $state.raw<GameState>();
-  let modal = $state<Dialog>();
+  let modal = $state.raw<Dialog | { pack: LevelPack }>();
   let loadError = $state(false);
   let levelList = $state<HTMLElement>();
+  const expandedPacks = new SvelteSet<string>();
   let levelScroll = 0;
   let pageScroll = 0;
-  let lastEntered: number | undefined;
+  let lastEntered: { id: number; packKey?: string } | undefined;
   let unsubscribe = () => {};
   let mounted = false;
 
@@ -67,10 +62,10 @@
   }
 
   async function showBoard() {
-    const id = gameState?.board?.level.id;
-    if (id === undefined) return;
+    const board = gameState?.board;
+    if (!board) return;
     window.scrollTo(0, 0);
-    modal = TUTORIALS[id]?.length ? "help" : undefined;
+    modal = board.help.length ? "help" : undefined;
     if (modal) return;
 
     await tick();
@@ -79,17 +74,23 @@
       ?.focus({ preventScroll: true });
   }
 
-  function openLevel(id: number) {
+  function openLevel(id: number, packKey?: string) {
     levelScroll = levelList?.scrollTop ?? 0;
     pageScroll = window.scrollY;
-    if (!app?.openLevel(id)) return;
-    lastEntered = id;
+    if (!app?.openLevel(id, packKey)) return;
+    lastEntered = { id, packKey };
     void showBoard();
   }
 
   function goNext() {
     if (!app?.nextLevel()) return;
-    lastEntered = gameState?.board?.level.id;
+    const board = gameState?.board;
+    if (board) {
+      lastEntered = {
+        id: board.level.id,
+        packKey: board.pack ? levelPackKey(board.pack) : undefined,
+      };
+    }
     void showBoard();
   }
 
@@ -99,9 +100,16 @@
     await tick();
     if (levelList) levelList.scrollTop = levelScroll;
     window.scrollTo(0, pageScroll);
-    levelList
-      ?.querySelector<HTMLElement>(`[data-level="${lastEntered}"]`)
-      ?.focus({ preventScroll: true });
+    if (lastEntered) {
+      const { id, packKey } = lastEntered;
+      const scope =
+        packKey === undefined
+          ? ":not([data-pack-key])"
+          : `[data-pack-key="${CSS.escape(packKey)}"]`;
+      levelList
+        ?.querySelector<HTMLElement>(`[data-level="${id}"]${scope}`)
+        ?.focus({ preventScroll: true });
+    }
   }
 
   function evaluate() {
@@ -159,8 +167,14 @@
     {/key}
   {:else}
     <LevelSelect
-      unlocked={gameState.save.unlocked}
+      save={gameState.save}
       {openLevel}
+      {expandedPacks}
+      installPack={async (pack) => {
+        await app?.installLevelPack(pack);
+      }}
+      movePack={(key, direction) => app?.moveLevelPack(key, direction)}
+      openPackInfo={(pack) => (modal = { pack })}
       openDialog={(dialog) => (modal = dialog)}
       bind:scrollRegion={levelList}
     />
@@ -168,7 +182,7 @@
 
   {#if gameState.saveError}
     <aside class="save-error">
-      <p role="status">Progress could not be saved.</p>
+      <p role="status">Profile changes could not be saved.</p>
       <button class="button" onclick={() => app?.retrySave()}>Retry</button>
     </aside>
   {/if}
@@ -186,59 +200,31 @@
 {#if modal && gameState}
   {#key modal}
     {@const game = gameState}
-    <Modal title={dialogs[modal]} {dismiss}>
+    {@const dialog = modal}
+    <Modal
+      title={typeof dialog === "string" ? dialogs[dialog] : dialog.pack.name}
+      {dismiss}
+    >
       {#snippet children()}
-        {#if modal === "help" && game.board}
+        {#if typeof dialog !== "string"}
+          <PackInfo pack={dialog.pack} useNotSymbol={game.save.useNotSymbol} />
+        {:else if dialog === "help" && game.board}
           <RichText
-            parts={TUTORIALS[game.board.level.id] ?? []}
+            parts={game.board.help}
             useNotSymbol={game.save.useNotSymbol}
           />
-        {:else if modal === "gates"}
-          <table class="reference">
-            <thead>
-              <tr><th>Gate</th><th>Symbol</th><th>Input → Output</th></tr>
-            </thead>
-            <tbody>
-              {#each gateReference as reference (reference.gate)}
-                {@const gate = reference.gate}
-                <tr>
-                  <td>{gateNames[gate]}</td>
-                  <td class="icon"
-                    ><GateIcon
-                      {gate}
-                      useNotSymbol={game.save.useNotSymbol}
-                      hoverable={false}
-                    /></td
-                  >
-                  <td class="math">
-                    {#if reference.gate === Gate.H}
-                      {#each [0, 1] as input (input)}
-                        <div class="hadamard-mapping">
-                          <math class="math" displaystyle="true">
-                            <mtext>|{input}⟩</mtext>
-                            <mo>→</mo>
-                            <mfrac>
-                              <mrow>
-                                <mtext>|0⟩</mtext>
-                                <mo lspace="0.15em" rspace="0.15em"
-                                  >{input === 0 ? "+" : "−"}</mo
-                                >
-                                <mtext>|1⟩</mtext>
-                              </mrow>
-                              <msqrt><mn>2</mn></msqrt>
-                            </mfrac>
-                          </math>
-                        </div>
-                      {/each}
-                    {:else}
-                      |0⟩ → {reference.zero}<br />|1⟩ → {reference.one}
-                    {/if}
-                  </td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        {:else if modal === "options"}
+        {:else if dialog === "gates"}
+          <GateReference useNotSymbol={game.save.useNotSymbol} />
+          {#each game.save.packs as pack (levelPackKey(pack))}
+            {#if pack.gates.length}
+              <GateReference
+                title={pack.name}
+                customGates={pack.gates}
+                useNotSymbol={game.save.useNotSymbol}
+              />
+            {/if}
+          {/each}
+        {:else if dialog === "options"}
           <label class="option">
             <input
               type="checkbox"
@@ -248,22 +234,28 @@
             />
             Use ⊕ Symbol
           </label>
-        {:else if modal === "about"}
+        {:else if dialog === "about"}
           <p>QuantumQ · Circuit Puzzle</p>
           <p>Version 2.0.0<br />Rayhan Alghiffari Azizi</p>
           <a href={asset("licenses/quantumq.txt")} download
             >GNU General Public License</a
           >
-        {:else if modal === "success" && game.board?.result?.nextLevelId === null}
-          <p>You completed the final puzzle.</p>
+        {:else if dialog === "success" && game.board?.result?.nextLevelId === null}
+          {@const pack = game.board.pack}
+          {@const completed = pack
+            ? (game.save.packProgress[levelPackKey(pack)] ?? [])
+            : []}
+          {#if !pack || packLevels(pack).every(({ id, goal }) => !goal || completed.includes(id))}
+            <p>You completed the final puzzle.</p>
+          {/if}
         {/if}
       {/snippet}
 
       {#snippet actions()}
-        {#if modal === "return"}
+        {#if dialog === "return"}
           <button class="button" onclick={dismiss}>Cancel</button>
           <button class="button" onclick={returnToMenu}>OK</button>
-        {:else if modal === "success"}
+        {:else if dialog === "success"}
           <button class="button" onclick={dismiss}>Close</button>
           {#if game.board?.result?.nextLevelId != null}
             <button class="button" onclick={goNext}>Next Level</button>
@@ -302,27 +294,6 @@
 
   .save-error p {
     margin: 0;
-  }
-
-  .reference {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-  }
-
-  .reference th,
-  .reference td {
-    padding: 0.45rem 0.35rem;
-    border-bottom: 1px solid var(--outline);
-  }
-
-  .icon {
-    width: 3.8rem;
-    min-width: 2.75rem;
-  }
-
-  .hadamard-mapping + .hadamard-mapping {
-    margin-top: 0.35rem;
   }
 
   .option {

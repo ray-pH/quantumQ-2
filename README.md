@@ -16,7 +16,7 @@ npm run format:check
 npm run build
 ```
 
-Host the contents of `dist/` on a static server. Progress and the X/⊕ setting are stored locally in each browser. To test the production bundle in Chromium, run `npx playwright install chromium` and then `npm run test:e2e`.
+Host the contents of `dist/` on a static server. Progress, custom packs, and the X/⊕ setting are stored locally in each browser. To test the production bundle in Chromium, run `npx playwright install chromium` and then `npm run test:e2e`.
 
 ## Native builds
 
@@ -44,6 +44,10 @@ For a Google Play build, set `QUANTUMQ_KEYSTORE` to the absolute path of the reg
 ```sh
 cargo tauri android build --ci --aab
 ```
+
+## Custom level packs
+
+Import ZIP packs below Sandbox. Each pack can define its own sections, puzzles, and gates. Start with the [example pack](examples/starter-pack/pack.json) and see the [custom pack guide](CUSTOM_PACKS.md) for authoring and import instructions.
 
 ## Game core and saves
 
