@@ -16,6 +16,10 @@ npm run build
 
 Host the contents of `dist/` on a static server. Progress, custom packs, and the X/⊕ setting are stored locally in each browser. To test the production bundle in Chromium, run `npx playwright install chromium` and then `npm run test:e2e`.
 
+### GitHub Pages
+
+In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. The **Build QuantumQ** workflow publishes the tested web build on pushes to `main`. After deployment, the site URL appears in the **Deploy to GitHub Pages** job.
+
 ## Native builds
 
 Install Rust and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for your platform.
