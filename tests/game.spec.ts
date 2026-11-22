@@ -1,5 +1,22 @@
 import { expect, test } from "@playwright/test";
 
+test("opens the GitHub repository from About in a new tab", async ({
+  page,
+  context,
+}) => {
+  const repository = "https://github.com/ray-pH/quantumQ-2";
+  await context.route(repository, (route) =>
+    route.fulfill({ body: "QuantumQ" }),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: "About", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "About" });
+  const popup = page.waitForEvent("popup");
+  await dialog.getByRole("link", { name: "GitHub repository" }).click();
+  await expect(await popup).toHaveURL(repository);
+  await expect(dialog).toBeVisible();
+});
+
 test("fits the main menu in a short landscape viewport", async ({ page }) => {
   await page.setViewportSize({ width: 873, height: 393 });
   await page.goto("/");

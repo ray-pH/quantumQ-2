@@ -2,7 +2,9 @@
   import { isPackLevelUnlocked, levelPackKey } from "@quantumq/core";
   import type { LevelPack } from "@quantumq/core";
   import type { SvelteSet } from "svelte/reactivity";
+  import { packGuideUrl } from "../links";
   import { readLevelPackArchive } from "../packArchive";
+  import ExternalLink from "./ExternalLink.svelte";
 
   let {
     packs,
@@ -70,6 +72,7 @@
     >
       {importing ? "Importing…" : "Import ZIP"}
     </button>
+    <ExternalLink href={packGuideUrl} label="Pack guide" asButton />
   </div>
 
   {#if error}

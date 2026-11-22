@@ -3,6 +3,18 @@ import { expect, test } from "@playwright/test";
 import { strToU8, zipSync } from "fflate";
 import starter from "../examples/starter-pack/pack.json" with { type: "json" };
 
+test("opens the pack guide in a new browser tab", async ({ page, context }) => {
+  const guide =
+    "https://github.com/ray-pH/quantumQ-2/blob/main/CUSTOM_PACKS.md";
+  await context.route(guide, (route) => route.fulfill({ body: "Pack guide" }));
+  await page.goto("/");
+  const menuUrl = page.url();
+  const popup = page.waitForEvent("popup");
+  await page.getByRole("link", { name: "Pack guide" }).click();
+  await expect(await popup).toHaveURL(guide);
+  await expect(page).toHaveURL(menuUrl);
+});
+
 test("fits custom gate labels by their rendered width as the board resizes", async ({
   page,
 }) => {

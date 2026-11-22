@@ -21,6 +21,7 @@
   "dependencies": {
     "@quantumq/core": "2.0.0",
     "@tauri-apps/api": "2.9.0",
+    "@tauri-apps/plugin-opener": "2.4.0",
     "@tauri-apps/plugin-store": "~2.3.0",
     "fflate": "0.8.3",
     "svelte": "5.57.2"

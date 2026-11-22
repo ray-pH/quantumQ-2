@@ -1,12 +1,23 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "main",
-  "description": "QuantumQ save access",
+  "description": "QuantumQ save access and GitHub links",
   "windows": ["main"],
   "permissions": [
     "store:allow-load",
     "store:allow-get",
     "store:allow-set",
-    "store:allow-save"
+    "store:allow-save",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {
+          "url": "https://github.com/ray-pH/quantumQ-2"
+        },
+        {
+          "url": "https://github.com/ray-pH/quantumQ-2/blob/main/CUSTOM_PACKS.md"
+        }
+      ]
+    }
   ]
 }

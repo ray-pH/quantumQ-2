@@ -4,6 +4,7 @@
   import { createGameApp, levelPackKey, packLevels } from "@quantumq/core";
   import type { GameApp, GameState, LevelPack } from "@quantumq/core";
   import { asset } from "./assets";
+  import ExternalLink from "./components/ExternalLink.svelte";
   import GameBoard from "./components/GameBoard.svelte";
   import GateReference from "./components/GateReference.svelte";
   import LevelSelect from "./components/LevelSelect.svelte";
@@ -11,6 +12,7 @@
   import Modal from "./components/Modal.svelte";
   import PackInfo from "./components/PackInfo.svelte";
   import RichText from "./components/RichText.svelte";
+  import { repositoryUrl } from "./links";
   import { getStorage } from "./storage";
 
   type Dialog = MenuDialog | "help" | "return" | "success";
@@ -237,9 +239,12 @@
         {:else if dialog === "about"}
           <p>QuantumQ · Circuit Puzzle</p>
           <p>Version 2.0.0<br />Rayhan Alghiffari Azizi</p>
-          <a href={asset("licenses/quantumq.txt")} download
-            >GNU General Public License</a
-          >
+          <div class="about-links">
+            <ExternalLink href={repositoryUrl} label="GitHub repository" />
+            <a href={asset("licenses/quantumq.txt")} download
+              >GNU General Public License</a
+            >
+          </div>
         {:else if dialog === "success" && game.board?.result?.nextLevelId === null}
           {@const pack = game.board.pack}
           {@const completed = pack
@@ -294,6 +299,12 @@
 
   .save-error p {
     margin: 0;
+  }
+
+  .about-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1rem;
   }
 
   .option {
