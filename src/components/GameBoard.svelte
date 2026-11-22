@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { TUTORIALS } from "@quantumq/core";
   import type { Board, Complex } from "@quantumq/core";
-  import { asset, gateNames } from "../assets";
+  import { asset, gateName } from "../assets";
   import CircuitBoard from "./CircuitBoard.svelte";
   import GateIcon from "./GateIcon.svelte";
   import RichText from "./RichText.svelte";
-  import type { Gate } from "@quantumq/core";
 
   let {
     board,
@@ -18,7 +16,7 @@
   }: {
     board: Board;
     useNotSymbol: boolean;
-    selectGate: (gate: Gate) => void;
+    selectGate: (gate: string) => void;
     placeGate: (row: number, column: number) => void;
     evaluate: () => void;
     menu: () => void;
@@ -37,8 +35,9 @@
 
 <main class="game">
   <h1 class="sr-only" tabindex="-1" data-screen-title>
-    {board.level.goal ? "Level" : "Sandbox"}
-    {board.level.id}
+    {board.pack
+      ? board.level.description
+      : `${board.level.goal ? "Level" : "Sandbox"} ${board.level.id}`}
   </h1>
   <header class="toolbar">
     <button class="button back" aria-label="Return to menu" onclick={menu}
@@ -46,13 +45,14 @@
     >
     <div class="palette" role="group" aria-label="Available gates">
       {#each board.level.gates as gate (gate)}
+        {@const customGate = board.customGates.get(gate)}
         <button
           class="gate"
-          aria-label={gateNames[gate]}
+          aria-label={gateName(gate, customGate)}
           aria-pressed={board.selectedGate === gate}
           onclick={() => selectGate(gate)}
         >
-          <GateIcon {gate} {useNotSymbol} />
+          <GateIcon {gate} {customGate} {useNotSymbol} />
           {#if board.selectedGate === gate}
             <img
               class="selected"
@@ -75,7 +75,7 @@
       <section class="panel" aria-labelledby="task-title">
         <header>
           <h2 id="task-title">Task</h2>
-          {#if TUTORIALS[board.level.id]?.length}
+          {#if board.help.length}
             <button class="button help" aria-label="Level help" onclick={help}
               >?</button
             >

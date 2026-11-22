@@ -1,4 +1,5 @@
 import { Gate } from "@quantumq/core";
+import type { CustomGate } from "@quantumq/core";
 
 export function asset(path: string): string {
   return `${import.meta.env.BASE_URL}assets/${path}`;
@@ -13,6 +14,10 @@ export const gateNames: Record<Gate, string> = {
   [Gate.Ctrl]: "Control",
   [Gate.S]: "Phase (S)",
 };
+
+export function gateName(gate: string, customGate?: CustomGate): string {
+  return customGate?.name ?? gateNames[gate as Gate];
+}
 
 const gateSprites: Record<Gate, string> = {
   [Gate.Empty]: "gateEmpty",

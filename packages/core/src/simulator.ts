@@ -1,17 +1,13 @@
 import { Gate } from "./types.ts";
-import type { Circuit, CircuitInput, Complex, Goal } from "./types.ts";
-
-type Matrix = readonly [
-  readonly [Complex, Complex],
-  readonly [Complex, Complex],
-];
+import type { CustomGate } from "./level-pack.ts";
+import type { Circuit, CircuitInput, Complex, Goal, Matrix } from "./types.ts";
 type MatrixGate = Exclude<Gate, typeof Gate.Empty | typeof Gate.Ctrl>;
 
 const h = Math.SQRT1_2;
 const zero: Complex = [0, 0];
 const one: Complex = [1, 0];
 
-const matrices: Record<MatrixGate, Matrix> = {
+export const GATE_MATRICES: Readonly<Record<MatrixGate, Matrix>> = {
   [Gate.H]: [
     [
       [h, 0],
@@ -74,6 +70,7 @@ export function probability([real, imaginary]: Complex): number {
 export function evaluateCircuit(
   circuit: Circuit,
   input: CircuitInput,
+  customGates?: ReadonlyMap<string, CustomGate>,
 ): Complex[] {
   const state = initialState(input);
   const count = qubitCount(input);
@@ -100,7 +97,11 @@ export function evaluateCircuit(
       if (gate === Gate.Empty || gate === Gate.Ctrl) continue;
 
       const targetBit = 1 << (count - row - 1);
-      const [[m00, m01], [m10, m11]] = matrices[gate];
+      const matrix = Object.hasOwn(GATE_MATRICES, gate)
+        ? GATE_MATRICES[gate as MatrixGate]
+        : customGates?.get(gate)?.matrix;
+      if (!matrix) throw new Error(`Unknown gate "${gate}"`);
+      const [[m00, m01], [m10, m11]] = matrix;
       for (let index = 0; index < state.length; index++) {
         if (index & targetBit || (index & controlMask) !== controlMask)
           continue;

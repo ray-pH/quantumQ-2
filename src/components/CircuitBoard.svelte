@@ -1,7 +1,7 @@
 <script lang="ts">
   import { COLUMN_COUNT, Gate } from "@quantumq/core";
   import type { Board } from "@quantumq/core";
-  import { asset, gateNames } from "../assets";
+  import { asset, gateName } from "../assets";
   import GateIcon from "./GateIcon.svelte";
 
   let {
@@ -102,13 +102,14 @@
       {#each wire as gate, column (column)}
         {@const index = row * COLUMN_COUNT + column}
         {@const locked = fixedCells.has(index)}
+        {@const customGate = board.customGates.get(gate)}
         <button
           class="cell"
           class:locked
           class:not-symbol={gate === Gate.X && useNotSymbol}
           style:grid-row={row + 1}
           style:grid-column={column + 2}
-          aria-label={`Qubit ${row + 1}, column ${column + 1}, ${gateNames[gate]}${locked ? ", locked" : ""}`}
+          aria-label={`Qubit ${row + 1}, column ${column + 1}, ${gateName(gate, customGate)}${locked ? ", locked" : ""}`}
           aria-disabled={locked}
           tabindex={cursor === index ? 0 : -1}
           data-cell={index}
@@ -116,7 +117,7 @@
           onkeydown={(event) => moveFocus(event, row, column)}
           onclick={() => placeGate(row, column)}
         >
-          <GateIcon {gate} {useNotSymbol} hoverable={!locked} />
+          <GateIcon {gate} {customGate} {useNotSymbol} hoverable={!locked} />
         </button>
       {/each}
     {/each}

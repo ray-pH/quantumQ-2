@@ -1,4 +1,7 @@
 import { LEVELS } from "./levels.ts";
+import { isPackLevelUnlocked, levelPackKey, packLevels } from "./level-pack.ts";
+import type { CustomGate, LevelPack } from "./level-pack.ts";
+import { TUTORIALS } from "./tutorials.ts";
 import {
   evaluateCircuit,
   isSolution,
@@ -24,8 +27,11 @@ export type Evaluation = Readonly<{
 
 export type Board = Readonly<{
   level: Level;
+  pack: LevelPack | null;
+  customGates: ReadonlyMap<string, CustomGate>;
+  help: readonly string[];
   circuit: Circuit;
-  selectedGate: Gate;
+  selectedGate: string;
   result: Evaluation | null;
 }>;
 
@@ -39,13 +45,21 @@ type Subscriber = (state: GameState) => void;
 
 const puzzles = LEVELS.filter(({ goal }) => goal !== null);
 
-function createBoard(level: Level): Board {
+function createBoard(level: Level, pack: LevelPack | null): Board {
   const circuit = Array.from({ length: qubitCount(level.input) }, () =>
-    Array<Gate>(COLUMN_COUNT).fill(Gate.Empty),
+    Array<string>(COLUMN_COUNT).fill(Gate.Empty),
   );
   for (const [row, column, gate] of level.locked) circuit[row][column] = gate;
 
-  return { level, circuit, selectedGate: level.gates[0], result: null };
+  return {
+    level,
+    pack,
+    customGates: new Map(pack?.gates.map((gate) => [gate.id, gate])),
+    help: (pack ? level.help : TUTORIALS[level.id]) ?? [],
+    circuit,
+    selectedGate: level.gates[0],
+    result: null,
+  };
 }
 
 export async function createGameApp({ storage }: { storage: SaveStorage }) {
@@ -62,7 +76,10 @@ export async function createGameApp({ storage }: { storage: SaveStorage }) {
     for (const subscriber of subscribers) subscriber(state);
   }
 
-  function persist(save: SaveData) {
+  function persist(
+    save: SaveData,
+    patch: Pick<Partial<GameState>, "board"> = {},
+  ) {
     pendingSave = pendingSave.then(async () => {
       try {
         await storage.save(save);
@@ -71,15 +88,29 @@ export async function createGameApp({ storage }: { storage: SaveStorage }) {
         update({ saveError: true });
       }
     });
-    update({ save });
+    update({ ...patch, save });
     return pendingSave;
   }
 
-  function openLevel(id: number): boolean {
-    const level = LEVELS.find((level) => level.id === id);
-    if (!level || !state.save.unlocked.includes(id)) return false;
+  function openLevel(id: number, packKey?: string): boolean {
+    const pack =
+      packKey === undefined
+        ? null
+        : state.save.packs.find(
+            (candidate) => levelPackKey(candidate) === packKey,
+          );
+    if (pack === undefined) return false;
+    const level = (pack ? packLevels(pack) : LEVELS).find(
+      (level) => level.id === id,
+    );
+    if (!level) return false;
+    const unlocked =
+      packKey === undefined
+        ? state.save.unlocked.includes(id)
+        : isPackLevelUnlocked(level, state.save.packProgress[packKey] ?? []);
+    if (!unlocked) return false;
 
-    update({ board: createBoard(level) });
+    update({ board: createBoard(level, pack) });
     return true;
   }
 
@@ -96,7 +127,7 @@ export async function createGameApp({ storage }: { storage: SaveStorage }) {
     returnToMenu() {
       update({ board: null });
     },
-    selectGate(gate: Gate): boolean {
+    selectGate(gate: string): boolean {
       const { board } = state;
       if (!board?.level.gates.includes(gate)) return false;
 
@@ -128,11 +159,30 @@ export async function createGameApp({ storage }: { storage: SaveStorage }) {
       const { board, save } = state;
       if (!board) return null;
 
-      const amplitudes = evaluateCircuit(board.circuit, board.level.input);
+      const amplitudes = evaluateCircuit(
+        board.circuit,
+        board.level.input,
+        board.customGates,
+      );
       const solved =
         board.level.goal !== null && isSolution(amplitudes, board.level.goal);
+      const sequence = board.pack
+        ? packLevels(board.pack).filter(({ goal }) => goal !== null)
+        : puzzles;
+      const packKey = board.pack ? levelPackKey(board.pack) : undefined;
+      const completed =
+        packKey === undefined ? [] : (save.packProgress[packKey] ?? []);
+      const completedAfter =
+        packKey !== undefined && solved && !completed.includes(board.level.id)
+          ? [...completed, board.level.id]
+          : completed;
       const nextLevelId = solved
-        ? (puzzles[puzzles.indexOf(board.level) + 1]?.id ?? null)
+        ? (sequence
+            .slice(sequence.indexOf(board.level) + 1)
+            .find(
+              (level) =>
+                !board.pack || isPackLevelUnlocked(level, completedAfter),
+            )?.id ?? null)
         : null;
       const result = {
         rows: amplitudes.map((amplitude, index) => ({
@@ -143,16 +193,56 @@ export async function createGameApp({ storage }: { storage: SaveStorage }) {
         solved,
         nextLevelId,
       };
-      update({ board: { ...board, result } });
-
-      if (nextLevelId !== null && !save.unlocked.includes(nextLevelId)) {
-        void persist({ ...save, unlocked: [...save.unlocked, nextLevelId] });
+      const patch = { board: { ...board, result } };
+      if (packKey !== undefined && completedAfter !== completed) {
+        void persist(
+          {
+            ...save,
+            packProgress: { ...save.packProgress, [packKey]: completedAfter },
+          },
+          patch,
+        );
+      } else if (
+        packKey === undefined &&
+        nextLevelId !== null &&
+        !save.unlocked.includes(nextLevelId)
+      ) {
+        void persist(
+          { ...save, unlocked: [...save.unlocked, nextLevelId] },
+          patch,
+        );
+      } else {
+        update(patch);
       }
       return result;
     },
     nextLevel(): boolean {
-      const nextId = state.board?.result?.nextLevelId;
-      return nextId != null && openLevel(nextId);
+      const board = state.board;
+      const nextId = board?.result?.nextLevelId;
+      return (
+        nextId != null &&
+        openLevel(nextId, board?.pack ? levelPackKey(board.pack) : undefined)
+      );
+    },
+    async installLevelPack(pack: LevelPack) {
+      const key = levelPackKey(pack);
+      if (
+        state.save.packs.some((candidate) => levelPackKey(candidate) === key)
+      ) {
+        throw new Error(
+          `A level pack with the identifier "${key}" is already installed.`,
+        );
+      }
+      await persist({ ...state.save, packs: [...state.save.packs, pack] });
+    },
+    moveLevelPack(key: string, direction: -1 | 1) {
+      const packs = [...state.save.packs];
+      const index = packs.findIndex((pack) => levelPackKey(pack) === key);
+      const destination = index + direction;
+      if (index < 0 || destination < 0 || destination >= packs.length) return;
+      const [pack] = packs.splice(index, 1);
+      packs.splice(destination, 0, pack);
+      return persist({ ...state.save, packs });
     },
     setUseNotSymbol(useNotSymbol: boolean) {
       return persist({ ...state.save, useNotSymbol });

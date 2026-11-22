@@ -1,9 +1,13 @@
 import { LEVELS } from "./levels.ts";
+import { levelPackKey, packLevels, parseLevelPack } from "./level-pack.ts";
+import type { LevelPack } from "./level-pack.ts";
 
 export type SaveData = Readonly<{
-  version: 1;
+  version: 2;
   unlocked: readonly number[];
   useNotSymbol: boolean;
+  packs: readonly LevelPack[];
+  packProgress: Readonly<Record<string, readonly number[]>>;
 }>;
 
 export interface SaveStorage {
@@ -30,11 +34,13 @@ function createSave(
   useNotSymbol: boolean,
 ): SaveData {
   return {
-    version: 1,
+    version: 2,
     unlocked: levelIds.filter(
       (id) => defaultUnlocked.includes(id) || unlocked.includes(id),
     ),
     useNotSymbol,
+    packs: [],
+    packProgress: {},
   };
 }
 
@@ -42,14 +48,35 @@ export function readSave(value: unknown): SaveData {
   if (value === undefined || value === null) return createSave([], false);
   if (
     !record(value) ||
-    value.version !== 1 ||
+    (value.version !== 1 && value.version !== 2) ||
     !Array.isArray(value.unlocked) ||
     typeof value.useNotSymbol !== "boolean"
   ) {
     throw new Error("QuantumQ could not read this save format.");
   }
 
-  return createSave(value.unlocked, value.useNotSymbol);
+  const save = createSave(value.unlocked, value.useNotSymbol);
+  if (value.version === 1) return save;
+  if (!Array.isArray(value.packs) || !record(value.packProgress)) {
+    throw new Error("QuantumQ could not read the saved level packs.");
+  }
+
+  const packProgress: Record<string, readonly number[]> = {};
+  const completed = value.packProgress;
+  const packs = value.packs.map((entry) => {
+    const pack = parseLevelPack(entry);
+    const key = levelPackKey(pack);
+    if (Object.hasOwn(packProgress, key))
+      throw new Error(`Duplicate saved pack "${key}".`);
+    const completedIds = completed[key];
+    packProgress[key] = Array.isArray(completedIds)
+      ? packLevels(pack)
+          .filter(({ id, goal }) => goal && completedIds.includes(id))
+          .map(({ id }) => id)
+      : [];
+    return pack;
+  });
+  return { ...save, packs, packProgress };
 }
 
 function readLegacyLine(text: string | null): unknown {
