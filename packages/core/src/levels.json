@@ -1,0 +1,962 @@
+{
+  "sections": {
+    "0": "Introduction",
+    "4": "Control",
+    "7": "Superposition",
+    "11": "Entanglement",
+    "13": "Phase",
+    "20": "More Puzzle",
+    "30": "",
+    "101": "Sandbox"
+  },
+  "levels": [
+    {
+      "id": 0,
+      "description": "evaluate intro",
+      "task": "Press the [b]Evaluate[/b] button",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [1, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty"],
+      "locked": []
+    },
+    {
+      "id": 1,
+      "description": "X intro",
+      "task": "Turn the qubit into state [i]|0⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [1]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [1, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "x"],
+      "locked": []
+    },
+    {
+      "id": 2,
+      "description": "Multi-bits intro",
+      "task": "Create the state [i]|10⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 1]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [0, 0],
+          [1, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "x"],
+      "locked": []
+    },
+    {
+      "id": 3,
+      "description": "Multi-bits two",
+      "task": "Create the state [i]|111⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 1, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [1, 0]
+        ]
+      },
+      "gates": ["empty", "x"],
+      "locked": []
+    },
+    {
+      "id": 4,
+      "description": "Control intro",
+      "task": "Create the state [i]|00⟩[/i] by placing a control to a gate\n\nGreyed out block mean it's locked and cannot be changed",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [1, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "control"],
+      "locked": [[1, 3, "x"]]
+    },
+    {
+      "id": 5,
+      "description": "Control more",
+      "task": "Create the state [i]|00⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 1]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [1, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "x", "control"],
+      "locked": [
+        [1, 0, "empty"],
+        [1, 1, "empty"],
+        [1, 2, "empty"],
+        [1, 4, "empty"],
+        [1, 5, "empty"],
+        [1, 6, "empty"],
+        [1, 7, "empty"],
+        [1, 8, "empty"],
+        [1, 9, "empty"],
+        [1, 10, "empty"],
+        [1, 11, "empty"],
+        [1, 3, "x"],
+        [0, 3, "control"]
+      ]
+    },
+    {
+      "id": 6,
+      "description": "Even more control",
+      "task": "Create the state [i]|100⟩[/i]\n\n*a gate can have more than one control nodes, and will active if all the control qubits is [i]|1⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 1, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [1, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "x", "control"],
+      "locked": [
+        [0, 0, "empty"],
+        [0, 1, "empty"],
+        [0, 2, "empty"],
+        [0, 3, "empty"],
+        [0, 5, "empty"],
+        [0, 6, "empty"],
+        [0, 7, "empty"],
+        [0, 8, "empty"],
+        [0, 9, "empty"],
+        [0, 10, "empty"],
+        [0, 11, "empty"],
+        [0, 4, "x"],
+        [1, 4, "control"],
+        [2, 4, "control"]
+      ]
+    },
+    {
+      "id": 7,
+      "description": "superposition intro",
+      "task": "Create a superposition of [i]|0⟩[/i] and [i]|1⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.707107, 0],
+          [0.707107, 0]
+        ]
+      },
+      "gates": ["empty", "x", "h"],
+      "locked": []
+    },
+    {
+      "id": 8,
+      "description": "superposition all",
+      "task": "Create a superposition of all 2-bits basis states.\n\nAll 2-bits basis states are ([i]|00⟩, |01⟩, |10⟩, |11⟩[/i])",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.5, 0],
+          [0.5, 0],
+          [0.5, 0],
+          [0.5, 0]
+        ]
+      },
+      "gates": ["empty", "x", "h"],
+      "locked": []
+    },
+    {
+      "id": 9,
+      "description": "superposition",
+      "task": "Create a superposition of [i]|01⟩[/i] and [i]|11⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [0.707107, 0],
+          [0, 0],
+          [0.707107, 0]
+        ]
+      },
+      "gates": ["empty", "x", "h"],
+      "locked": []
+    },
+    {
+      "id": 10,
+      "description": "superposition of more bits",
+      "task": "Create a superposition of [i]|001⟩[/i] and [i]|011⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [1, 0, 1]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [0.707107, 0],
+          [0, 0],
+          [0.707107, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "x", "h"],
+      "locked": []
+    },
+    {
+      "id": 11,
+      "description": "entanglement",
+      "task": "Using a control node, create an entangled pair of qubits with the same state ( superposition of [i]|00⟩[/i] and [i]|11⟩[/i] )\n\n[b]Hint :[/b]\nwhen dealing with superpositions, you can treat each basis state as its own case or its own universe. the activation of a controlled gate is only affected by the state of the control bit in each separate case/universe.",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.707107, 0],
+          [0, 0],
+          [0, 0],
+          [0.707107, 0]
+        ]
+      },
+      "gates": ["empty", "x", "h", "control"],
+      "locked": []
+    },
+    {
+      "id": 12,
+      "description": "entanglement",
+      "task": "Create an entangled pair of qubits with the opposite state ( superposition of [i]|01⟩[/i] and [i]|10⟩[/i] )",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [0.707107, 0],
+          [0.707107, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "x", "h", "control"],
+      "locked": []
+    },
+    {
+      "id": 13,
+      "description": "phase intro",
+      "task": "Turn the qubit back into state [i]|0⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [1, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "x", "h", "control"],
+      "locked": [[0, 0, "h"]]
+    },
+    {
+      "id": 14,
+      "description": "phase again",
+      "task": "[b]Input : [/b] [i]|ψ⟩ = ( |0⟩ - |1⟩ )/sqrt(2)[/i]\n\nTurn the qubit into state [i]|0⟩[/i]",
+      "input": {
+        "kind": "state",
+        "qubits": 1,
+        "amplitudes": [
+          [0.707107, 0],
+          [-0.707107, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [1, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "x", "h", "control"],
+      "locked": []
+    },
+    {
+      "id": 15,
+      "description": "flip probability",
+      "task": "[b]Input : [/b] The input state has 30% probability of [i]|0⟩[/i]and 70% probability of [i]|1⟩[/i]\n\nflip it so it has 30% probability of [i]|1⟩[/i] and 70% probability of [i]|0⟩[/i]",
+      "input": {
+        "kind": "state",
+        "qubits": 1,
+        "amplitudes": [
+          [0.5477225575051661, 0],
+          [0.8366600265340756, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.8366600265340756, 0],
+          [0.5477225575051661, 0]
+        ]
+      },
+      "gates": ["empty", "x", "h", "control"],
+      "locked": []
+    },
+    {
+      "id": 16,
+      "description": "phase flip",
+      "task": "Turn the qubit into state [i](|0⟩ - |1⟩)/sqrt(2)[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": {
+        "kind": "amplitude",
+        "amplitudes": [
+          [0.7071067811865475, 0],
+          [-0.7071067811865475, 0]
+        ]
+      },
+      "gates": ["empty", "h", "z"],
+      "locked": []
+    },
+    {
+      "id": 17,
+      "description": "phase flip some more",
+      "task": "Turn the qubit from [i]|0⟩[/i] to [i]|1⟩[/i] using only Hadamard and Pauli-Z gate.",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [1, 0]
+        ]
+      },
+      "gates": ["empty", "h", "z"],
+      "locked": []
+    },
+    {
+      "id": 18,
+      "description": "Y gate",
+      "task": "Create the state ( [i]–i|0⟩ – i|1⟩[/i] )/sqrt(2)",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": {
+        "kind": "amplitude",
+        "amplitudes": [
+          [0, -0.7071067811865475],
+          [0, -0.7071067811865475]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z"],
+      "locked": []
+    },
+    {
+      "id": 19,
+      "description": "S gate",
+      "task": "Create the state [i]–i|1⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": {
+        "kind": "amplitude",
+        "amplitudes": [
+          [0, 0],
+          [0, -1]
+        ]
+      },
+      "gates": ["empty", "x", "s", "z"],
+      "locked": []
+    },
+    {
+      "id": 20,
+      "description": "superposition prepare",
+      "task": "Prepare a system of qubits that's in a superposition of [i]|100⟩[/i], [i]|101⟩[/i], [i]|110⟩[/i], and [i]|111⟩[/i] with uniform probability",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0.5, 0],
+          [0.5, 0],
+          [0.5, 0],
+          [0.5, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 21,
+      "description": "superposition prepare with entanglement",
+      "task": "Prepare a system of qubits that's in a superposition of [i]|000⟩[/i], [i]|001⟩[/i], [i]|110⟩[/i], and [i]|111⟩[/i] with uniform probability",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.5, 0],
+          [0.5, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0.5, 0],
+          [0.5, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 22,
+      "description": "prob swap",
+      "task": "[b]Input : [/b] The input state is\n[i]|ψ⟩ = [/i]√(0.1)[i]|00⟩ +[/i] √(0.2)[i]|01⟩ +[/i] √(0.3)[i]|10⟩ +[/i] √(0.4)[i]|11⟩[/i]\n\nSwap the probability of getting [i]|10⟩[/i] and [i]|11⟩[/i]\n\n[b]Expected Output :[/b]\n[i]|00⟩[/i] : 10%\n[i]|01⟩[/i] : 20%\n[i]|10⟩[/i] : 40%\n[i]|11⟩[/i] : 30%",
+      "input": {
+        "kind": "state",
+        "qubits": 2,
+        "amplitudes": [
+          [0.31622776601683794, 0],
+          [0.4472135954999579, 0],
+          [0.5477225575051661, 0],
+          [0.6324555320336759, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.31622776601683794, 0],
+          [0.4472135954999579, 0],
+          [0.6324555320336759, 0],
+          [0.5477225575051661, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "z", "control"],
+      "locked": []
+    },
+    {
+      "id": 23,
+      "description": "X using YSZ",
+      "task": "Flip the qubit into state [i]+|1⟩[/i] using Y,S,Z gate only",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": {
+        "kind": "amplitude",
+        "amplitudes": [
+          [0, 0],
+          [1, 0]
+        ]
+      },
+      "gates": ["empty", "y", "s", "z"],
+      "locked": []
+    },
+    {
+      "id": 24,
+      "description": "AND gate",
+      "task": "Create an equivalent of AND gate\n( [i]Q2 = Q0 AND Q1[/i] )\n\nif [i]Q0 = |0⟩[/i] and [i]Q1 = |1⟩[/i], then [i]Q2 = |0⟩[/i] since [i]0 AND 1 = 0[/i]. this equation is represented by the state [i]|010⟩[/i]\n\nThe hadamard gate in the first column is to represent all the possible input\n\n[b]Expected Output :[/b]\nUniform superposition of [i]|000⟩, |010⟩, |100⟩,[/i] and [i]|111⟩[/i]\n",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.5, 0],
+          [0, 0],
+          [0.5, 0],
+          [0, 0],
+          [0.5, 0],
+          [0, 0],
+          [0, 0],
+          [0.5, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": [
+        [0, 0, "h"],
+        [1, 0, "h"],
+        [2, 0, "empty"]
+      ]
+    },
+    {
+      "id": 25,
+      "description": "OR gate",
+      "task": "Create an equivalent of OR gate\n( [i]Q2 = Q0 OR Q1[/i] )\n\n[b]Expected Output :[/b]\nUniform superposition of [i]|000⟩, |011⟩, |101⟩,[/i] and [i]|111⟩[/i]\n",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0, 0]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.5, 0],
+          [0, 0],
+          [0, 0],
+          [0.5, 0],
+          [0, 0],
+          [0.5, 0],
+          [0, 0],
+          [0.5, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": [
+        [0, 0, "h"],
+        [1, 0, "h"],
+        [2, 0, "empty"]
+      ]
+    },
+    {
+      "id": 26,
+      "description": "Clearing entanglement",
+      "task": "The input state is an entangled state\n[i]|ψ⟩ = |00⟩ + |11⟩[/i].\n\nMake the output 100% [i]|00⟩[/i]",
+      "input": {
+        "kind": "state",
+        "qubits": 2,
+        "amplitudes": [
+          [0.7071067811865476, 0],
+          [0, 0],
+          [0, 0],
+          [0.7071067811865476, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [1, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 27,
+      "description": "Clearing entanglement again",
+      "task": "The input state is an entangled state\n[i]|ψ⟩ = |000⟩ + |111⟩[/i].\n\nMake the output 100% [i]|010⟩[/i]",
+      "input": {
+        "kind": "state",
+        "qubits": 3,
+        "amplitudes": [
+          [0.7071067811865476, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0.7071067811865476, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [0, 0],
+          [1, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 28,
+      "description": "Swap qubit",
+      "task": "The top qubit has 20% chance of [i]|0⟩[/i] and 80% of [i]|1⟩[/i].\nThe bottom qubit is 100% [i]|0⟩[/i].\nSwap the top qubit and the bottom qubit\n\n[b]Expected Output :[/b]\n[i]|00⟩[/i] : 20%\n[i]|01⟩[/i] : 80%",
+      "input": {
+        "kind": "state",
+        "qubits": 2,
+        "amplitudes": [
+          [0.4472135954999579, 0],
+          [0, 0],
+          [0.8944271909999159, 0],
+          [0, 0]
+        ]
+      },
+      "goal": {
+        "kind": "amplitude",
+        "amplitudes": [
+          [0.4472135954999579, 0],
+          [0.8944271909999159, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 29,
+      "description": "prob swap inside",
+      "task": "[b]Input : [/b] The input state is\n[i]|ψ⟩ = [/i]√(0.1)[i]|00⟩ +[/i] √(0.2)[i]|01⟩ +[/i] √(0.3)[i]|10⟩ +[/i] √(0.4)[i]|11⟩[/i]\n\nSwap the probability of getting [i]|10⟩[/i] and [i]|01⟩[/i]\n\n[b]Expected Output :[/b]\n[i]|00⟩[/i] : 10%\n[i]|01⟩[/i] : 30%\n[i]|10⟩[/i] : 20%\n[i]|11⟩[/i] : 40%",
+      "input": {
+        "kind": "state",
+        "qubits": 2,
+        "amplitudes": [
+          [0.31622776601683794, 0],
+          [0.4472135954999579, 0],
+          [0.5477225575051661, 0],
+          [0.6324555320336759, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.31622776601683794, 0],
+          [0.5477225575051661, 0],
+          [0.4472135954999579, 0],
+          [0.6324555320336759, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 30,
+      "description": "combining",
+      "task": "[b]Expected Output :[/b]\n[i]|00⟩[/i] : 20%\n[i]|11⟩[/i] : 80%\n\n[b]Input : [/b] The input state is [i]|ψ⟩[/i], where\n[i]|00⟩[/i] : 20%\n[i]|10⟩[/i] : 40%\n[i]|11⟩[/i] : 40%",
+      "input": {
+        "kind": "state",
+        "qubits": 2,
+        "amplitudes": [
+          [0.4472135954999579, 0],
+          [0, 0],
+          [0.6324555320336759, 0],
+          [0.6324555320336759, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.4472135954999579, 0],
+          [0, 0],
+          [0, 0],
+          [0.8944271909999159, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 31,
+      "description": "Phase thing",
+      "task": "Create a superposition of all possible states, with negative imaginary component\n\n[b]Expected Output :[/b]\n[i]– [/i]√(0.5)i[i] |0⟩\n– [/i]√(0.5)i [i]|1⟩[/i]\n≈\n[i]– [/i]0.7071i [i]|0⟩\n– [/i]0.7071i [i]|1⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": {
+        "kind": "amplitude",
+        "amplitudes": [
+          [0, -0.707107],
+          [0, -0.707107]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 32,
+      "description": "Phase thing again",
+      "task": "Create a superposition of all possible states, with negative imaginary component\n\n[b]Expected Output :[/b]\n[i]– [/i]0.5i[i] |00⟩[/i]\n[i]– [/i]0.5i[i] |01⟩[/i]\n[i]– [/i]0.5i[i] |10⟩[/i]\n[i]– [/i]0.5i[i] |11⟩[/i]\n",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0]
+      },
+      "goal": {
+        "kind": "amplitude",
+        "amplitudes": [
+          [0, -0.5],
+          [0, -0.5],
+          [0, -0.5],
+          [0, -0.5]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 33,
+      "description": "splitting",
+      "task": "[b]Expected Output :[/b]\n[i]|00⟩[/i] : 20%\n[i]|01⟩[/i] : 20%\n[i]|10⟩[/i] : 30%\n[i]|11⟩[/i] : 30%\n\n[b]Input : [/b] The input state is [i]|ψ⟩[/i], where\n[i]|00⟩[/i] : 40%\n[i]|10⟩[/i] : 30%\n[i]|11⟩[/i] : 30%",
+      "input": {
+        "kind": "state",
+        "qubits": 2,
+        "amplitudes": [
+          [0.6324555320336759, 0],
+          [0, 0],
+          [0.5477225575051661, 0],
+          [0.5477225575051661, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.4472135954999579, 0],
+          [0.4472135954999579, 0],
+          [0.5477225575051661, 0],
+          [0.5477225575051661, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 34,
+      "description": "prob reverse order",
+      "task": "[b]Input : [/b] The input state is\n[i]|ψ⟩ = [/i]√(0.1)[i]|00⟩ +[/i] √(0.2)[i]|01⟩ +[/i] √(0.3)[i]|10⟩ +[/i] √(0.4)[i]|11⟩[/i]\n\nReverse the order of the probabilities\n\n[b]Expected Output :[/b]\n[i]|00⟩[/i] : 40%\n[i]|01⟩[/i] : 30%\n[i]|10⟩[/i] : 20%\n[i]|11⟩[/i] : 10%",
+      "input": {
+        "kind": "state",
+        "qubits": 2,
+        "amplitudes": [
+          [0.31622776601683794, 0],
+          [0.4472135954999579, 0],
+          [0.5477225575051661, 0],
+          [0.6324555320336759, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.6324555320336759, 0],
+          [0.5477225575051661, 0],
+          [0.4472135954999579, 0],
+          [0.31622776601683794, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 35,
+      "description": "collapsing and splitting",
+      "task": "[b]Expected Output :[/b]\n[i]|00⟩[/i] : 20%\n[i]|01⟩[/i] : 20%\n[i]|11⟩[/i] : 60%\n\n[b]Input : [/b] The input state is [i]|ψ⟩[/i], where\n[i]|00⟩[/i] : 40%\n[i]|10⟩[/i] : 30%\n[i]|11⟩[/i] : 30%",
+      "input": {
+        "kind": "state",
+        "qubits": 2,
+        "amplitudes": [
+          [0.6324555320336759, 0],
+          [0, 0],
+          [0.5477225575051661, 0],
+          [0.5477225575051661, 0]
+        ]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0.4472135954999579, 0],
+          [0.4472135954999579, 0],
+          [0, 0],
+          [0.7745966692414834, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 36,
+      "description": "negating",
+      "task": "Turn the qubit back into the input state. (cancel out all the initially placed gates)",
+      "input": {
+        "kind": "state",
+        "qubits": 3,
+        "amplitudes": [
+          [0.458257569495584, 0],
+          [0.565685424949238, 0],
+          [0, 0.6557438524302001],
+          [0, 0.2],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "goal": {
+        "kind": "amplitude",
+        "amplitudes": [
+          [0.458257569495584, 0],
+          [0.565685424949238, 0],
+          [0, 0.6557438524302001],
+          [0, 0.2],
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": [
+        [0, 0, "h"],
+        [1, 0, "empty"],
+        [2, 0, "z"],
+        [0, 1, "control"],
+        [1, 1, "x"],
+        [2, 1, "x"],
+        [0, 2, "s"],
+        [1, 2, "empty"],
+        [2, 2, "empty"]
+      ]
+    },
+    {
+      "id": 37,
+      "description": "Hadamard thing",
+      "task": "Make the output 100% [i]|11⟩[/i]",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 1]
+      },
+      "goal": {
+        "kind": "probability",
+        "amplitudes": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [1, 0]
+        ]
+      },
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": [
+        [0, 4, "h"],
+        [1, 4, "control"],
+        [0, 11, "control"],
+        [1, 11, "h"]
+      ]
+    },
+    {
+      "id": 101,
+      "description": "sanbox 1bit",
+      "task": "[This is a sandbox environment.]",
+      "input": {
+        "kind": "basis",
+        "bits": [0]
+      },
+      "goal": null,
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 102,
+      "description": "sanbox 2bit",
+      "task": "[This is a sandbox environment.]",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0]
+      },
+      "goal": null,
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 103,
+      "description": "sanbox 3bit",
+      "task": "[This is a sandbox environment.]",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0, 0]
+      },
+      "goal": null,
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    },
+    {
+      "id": 104,
+      "description": "sandbox 4bit",
+      "task": "[This is a sandbox environment.]",
+      "input": {
+        "kind": "basis",
+        "bits": [0, 0, 0, 0]
+      },
+      "goal": null,
+      "gates": ["empty", "h", "x", "y", "z", "control", "s"],
+      "locked": []
+    }
+  ]
+}
